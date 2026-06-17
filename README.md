@@ -4,7 +4,6 @@
 
 > **Ender** democratizes blockchain development by allowing anyone to build sophisticated decentralized applications (dapps) simply by describing them. By combining advanced AI code generation with robust web scraping capabilities, Ender turns natural language into deployed, functional dapps on Solana and Celo in minutes, not months.
 
-![Ender Banner](public/og-image.png)
 
 ## 🚀 Overview
 
