@@ -74,6 +74,7 @@
     "react-syntax-highlighter": "^15.6.1",
     "scrapegraph-js": "^0.2.2",
     "sonner": "^2.0.7",
+    "stellar-sdk": "^12.0.0",
     "tailwind-gradient-mask-image": "^1.2.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
