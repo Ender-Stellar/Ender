@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SmartScraperApi } from "scrapegraph-js";
+import { ScrapeGraphAI } from "scrapegraph-js";
 
 // Function to sanitize smart quotes and other problematic characters
 function sanitizeQuotes(text: string): string {
@@ -31,23 +31,23 @@ export async function POST(request: NextRequest) {
       throw new Error("SCRAPEGRAPH_API_KEY environment variable is not set");
     }
 
-    // Initialize ScrapeGraph SmartScraperApi
-    const client = new SmartScraperApi(SCRAPEGRAPH_API_KEY);
+    // Initialize ScrapeGraphAI
+    const client = ScrapeGraphAI({ apiKey: SCRAPEGRAPH_API_KEY });
 
     // Use ScrapeGraph’s API to extract webpage content
-    const response = await client.run({
-      websiteUrl: url,
-      userPrompt:
+    const response = await client.extract({
+      url,
+      prompt:
         "Extract the main content from this webpage including title, description, headings, paragraphs, links, and all readable text. Preserve structure.",
     });
 
     console.log("[scrape-url-scrapegraph] Response received:", response);
 
-    if (!response || !response.result) {
-      throw new Error("Failed to scrape content – no result returned");
+    if (response.status !== "success" || !response.data) {
+      throw new Error(response.error || "Failed to scrape content – no result returned");
     }
 
-    const resultData = response.result;
+    const resultData = response.data;
     let markdownContent = "";
 
     if (typeof resultData === "object") {

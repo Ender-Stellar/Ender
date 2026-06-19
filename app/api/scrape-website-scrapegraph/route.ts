@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SmartScraperApi } from "scrapegraph-js";
+import { ScrapeGraphAI } from "scrapegraph-js";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize real ScrapeGraph client
-    const client = new SmartScraperApi(apiKey);
+    const client = ScrapeGraphAI({ apiKey });
 
     // Construct user prompt
     let userPrompt =
@@ -53,16 +53,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Call ScrapeGraph smart scraper
-    const scrapeResult = await client.run({
-      websiteUrl: url,
-      userPrompt,
+    const scrapeResult = await client.extract({
+      url,
+      prompt: userPrompt,
     });
 
-    if (!scrapeResult || !scrapeResult.result) {
-      throw new Error("Failed to scrape website – no result returned");
+    if (scrapeResult.status !== "success" || !scrapeResult.data) {
+      throw new Error(scrapeResult.error || "Failed to scrape website – no result returned");
     }
 
-    const resultData = scrapeResult.result;
+    const resultData = scrapeResult.data;
 
     // ----------------------------------------------------
     // Process Result
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           sourceURL: url,
           statusCode: 200,
           scraper: "scrapegraph-ai",
-          requestId: scrapeResult.request_id,
+          requestId: (scrapeResult as any).request_id || null,
         },
         screenshot: null, // ScrapeGraph smartscraper does NOT support screenshots
         links: [],

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SmartScraperApi } from "scrapegraph-js";
+import { ScrapeGraphAI } from "scrapegraph-js";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,14 +27,17 @@ export async function POST(req: NextRequest) {
       url
     );
 
-    // SmartScraperApi replaces "Client"
-    const client = new SmartScraperApi(apiKey);
+    // Initialize ScrapeGraphAI client
+    const client = ScrapeGraphAI({ apiKey });
 
-    const scrapeResult = await client.run({
-      websiteUrl: url,
-      userPrompt:
-        "Extract the page title, description, and main visual elements description.",
+    const scrapeResult = await client.extract({
+      url,
+      prompt: "Extract the page title, description, and main visual elements description.",
     });
+
+    if (scrapeResult.status !== "success" || !scrapeResult.data) {
+      throw new Error(scrapeResult.error || "Failed to scrape content – no result returned");
+    }
 
     console.log(
       "[scrape-screenshot-scrapegraph] Scrape result:",
@@ -46,10 +49,10 @@ export async function POST(req: NextRequest) {
       screenshot: null,
       metadata: {
         scraper: "scrapegraph-ai",
-        requestId: scrapeResult.request_id,
+        requestId: (scrapeResult as any).request_id || null,
         note:
           "ScrapeGraph AI does not provide screenshot functionality. Use Firecrawl for live browser screenshots.",
-        result: scrapeResult.result,
+        result: scrapeResult.data,
       },
       message:
         "Content scraped successfully, but screenshots are not supported by ScrapeGraph AI.",
